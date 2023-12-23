@@ -9,29 +9,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// prListCmd represents the list command
 var prListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// if len(args) == 0 || args[0] == "" {
-		// 	fmt.Println("A repository must be specified")
-		// 	return
-		// }
-
+	Short: "List pull requests in a Bitbucket repository",
+	Long:  `List pull requests in a Bitbucket repository`,
+	Run: func(cmd *cobra.Command, _ []string) {
 		workspace, _ := cmd.Flags().GetString("workspace")
-
-		// TODO: Get this value from a flag
-		repo := ""
-		if len(args) > 0 {
-			repo = args[0]
-		}
+		repo, _ := cmd.Flags().GetString("repo")
 
 		if repo == "" {
 			repo, _ = bitbucket.GetRepoNameFromCurrentDir()
@@ -64,14 +48,6 @@ to quickly create a Cobra application.`,
 func init() {
 	prCmd.AddCommand(prListCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
 	prListCmd.Flags().StringP("workspace", "w", "synvia", "Get the repositories from this workspace")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	prListCmd.Flags().StringP("repo", "r", "", "Get the pull requests from this repository")
 }
