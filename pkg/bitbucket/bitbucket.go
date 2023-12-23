@@ -38,11 +38,13 @@ func GetRepoNameFromCurrentDir() (string, error) {
 	}
 	defer file.Close()
 
+	var repoName string
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if strings.Contains(line, "url =") {
+		if strings.Contains(line, "url =") && strings.Contains(line, "bitbucket.org") {
 			parts := strings.Split(line, "=")
 
 			if len(parts) != 2 {
@@ -50,9 +52,7 @@ func GetRepoNameFromCurrentDir() (string, error) {
 			}
 
 			url := strings.TrimSpace(parts[1])
-			repoName := extractReponameFromUrl(url)
-
-			return repoName, nil
+			repoName = extractReponameFromUrl(url)
 		}
 	}
 
@@ -60,7 +60,11 @@ func GetRepoNameFromCurrentDir() (string, error) {
 		return "", err
 	}
 
-	return "", fmt.Errorf("repository URL not found")
+	if strings.TrimSpace(repoName) == "" {
+		return "", fmt.Errorf("repository URL not found")
+	}
+
+	return repoName, nil
 }
 
 func extractReponameFromUrl(url string) string {
