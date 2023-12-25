@@ -31,14 +31,15 @@ func MakeHttpRequest(method string, url string, body io.Reader) (*http.Request, 
 	return req, err
 }
 
-func GetRepoNameFromCurrentDir() (string, error) {
+func GetRepoAndWorkspaceNameFromCurrentDir() (string, string, error) {
 	file, err := os.Open(".git/config")
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	defer file.Close()
 
 	var repoName string
+	var workspaceName string
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -48,31 +49,32 @@ func GetRepoNameFromCurrentDir() (string, error) {
 			parts := strings.Split(line, "=")
 
 			if len(parts) != 2 {
-				return "", fmt.Errorf("unexpected format of .git/config")
+				return "", "", fmt.Errorf("unexpected format of .git/config")
 			}
 
 			url := strings.TrimSpace(parts[1])
-			repoName = extractReponameFromUrl(url)
+			repoName, workspaceName = extractRepoAndWorkspaceNameFromUrl(url)
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	if strings.TrimSpace(repoName) == "" {
-		return "", fmt.Errorf("repository URL not found")
+		return "", "", fmt.Errorf("repository URL not found")
 	}
 
-	return repoName, nil
+	return repoName, workspaceName, nil
 }
 
-func extractReponameFromUrl(url string) string {
+func extractRepoAndWorkspaceNameFromUrl(url string) (string, string) {
 	parts := strings.Split(url, "/")
 	if len(parts) >= 2 {
 		repo := parts[len(parts)-1]
-		return strings.TrimSuffix(repo, ".git")
+		workspace := parts[len(parts)-2]
+		return strings.TrimSuffix(repo, ".git"), workspace
 	}
 
-	return ""
+	return "", ""
 }
