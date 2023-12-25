@@ -19,7 +19,7 @@ var prListCmd = &cobra.Command{
 		repo, _ := cmd.Flags().GetString("repo")
 
 		if repo != "" {
-			if workspace != "" {
+			if workspace == "" {
 				savedConfig, _ := config.GetConfig()
 
 				workspace = savedConfig.DefaultWorkspace
