@@ -42,6 +42,7 @@ func GetToken() (string, error) {
 
 	return string(item), err
 }
+
 type Config struct {
 	DefaultWorkspace string `mapstructure:"default_workspace"`
 }
@@ -78,4 +79,16 @@ func AddConfig(key string, value string) error {
 	viper.Set(key, value)
 
 	return viper.WriteConfig()
+}
+
+func GetConfig() (Config, error) {
+	var config Config
+
+	viper.ReadInConfig()
+
+	if err := viper.Unmarshal(&config); err != nil {
+		return config, err
+	}
+
+	return config, nil
 }
