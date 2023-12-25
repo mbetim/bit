@@ -40,8 +40,8 @@ var prListCmd = &cobra.Command{
 
 		prs, err := bitbucket.GetPullRequestsFromRepo(workspace, repo)
 		if err != nil {
-			fmt.Printf("Error: %v", err)
-			os.Exit(1)
+			fmt.Printf("Error: %v\n", err)
+			return
 		}
 
 		cCyan := "\033[36m"

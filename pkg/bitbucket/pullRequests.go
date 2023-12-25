@@ -1,9 +1,7 @@
 package bitbucket
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 )
@@ -26,38 +24,18 @@ type PullRequestResponse struct {
 
 func GetPullRequestsFromRepo(workspace string, repo string) ([]PullRequest, error) {
 	var prs PullRequestResponse
-	client := &http.Client{}
 
-	req, err := MakeHttpRequest("GET", BaseURL+"/repositories/"+workspace+"/"+repo+"/pullrequests", nil)
+	resp, err := MakeHttpRequest("GET", BaseURL+"/repositories/"+workspace+"/"+repo+"/pullrequests", nil, &prs)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return prs.Values, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == 401 {
-		log.Fatalf("Invalid credentials")
-	}
-
 	if resp.StatusCode == http.StatusNotFound {
-		log.Fatalf("Repo %v not found in workspace %v", repo, workspace)
+		return nil, fmt.Errorf("repo %v not found in workspace %v", repo, workspace)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return prs.Values, fmt.Errorf("error: status code getting prs is %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return prs.Values, err
-	}
-
-	if err := json.Unmarshal(body, &prs); err != nil {
-		return prs.Values, err
+		return nil, fmt.Errorf("error: status code getting prs is %d", resp.StatusCode)
 	}
 
 	return prs.Values, nil
