@@ -6,7 +6,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/mbetim/bit/pkg/bitbucket"
-	"github.com/mbetim/bit/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -15,18 +14,7 @@ var prListCmd = &cobra.Command{
 	Short: "List pull requests in a Bitbucket repository",
 	Long:  `List pull requests in a Bitbucket repository`,
 	Run: func(cmd *cobra.Command, _ []string) {
-		workspace, _ := cmd.Flags().GetString("workspace")
-		repo, _ := cmd.Flags().GetString("repo")
-
-		if repo != "" {
-			if workspace == "" {
-				savedConfig, _ := config.GetConfig()
-
-				workspace = savedConfig.DefaultWorkspace
-			}
-		} else {
-			repo, workspace, _ = bitbucket.GetRepoAndWorkspaceNameFromCurrentDir()
-		}
+		repo, workspace := GetRepoAndWorkspaceFromCmdOrConfig(cmd)
 
 		if repo == "" {
 			fmt.Println("A repository must be specified, either as argument or in the current directory")
@@ -59,8 +47,4 @@ var prListCmd = &cobra.Command{
 
 func init() {
 	prCmd.AddCommand(prListCmd)
-
-	// prListCmd.Flags().StringP("workspace", "w", "synvia", "Get the repositories from this workspace")
-	prListCmd.Flags().StringP("workspace", "w", "", "Get the repositories from this workspace")
-	prListCmd.Flags().StringP("repo", "r", "", "Get the pull requests from this repository")
 }
