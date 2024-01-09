@@ -89,7 +89,7 @@ func GetRepoAndWorkspaceNameFromCurrentDir() (string, string, error) {
 			}
 
 			url := strings.TrimSpace(parts[1])
-			repoName, workspaceName = extractRepoAndWorkspaceNameFromUrl(url)
+			repoName, workspaceName = extractRepoAndWorkspaceNameFromRemote(url)
 		}
 	}
 
@@ -104,13 +104,29 @@ func GetRepoAndWorkspaceNameFromCurrentDir() (string, string, error) {
 	return repoName, workspaceName, nil
 }
 
-func extractRepoAndWorkspaceNameFromUrl(url string) (string, string) {
-	parts := strings.Split(url, "/")
-	if len(parts) >= 2 {
-		repo := parts[len(parts)-1]
-		workspace := parts[len(parts)-2]
-		return strings.TrimSuffix(repo, ".git"), workspace
+func extractRepoAndWorkspaceNameFromRemote(url string) (string, string) {
+	if strings.HasPrefix(url, "https") {
+		return extractRepoAndWorkspaceNameFromHttps(url)
 	}
 
-	return "", ""
+	return extractRepoAndWorkspaceNameFromSsh(url)
+}
+
+func extractRepoAndWorkspaceNameFromHttps(url string) (string, string) {
+	urlParts := strings.Split(url, "/")
+
+	repo := urlParts[len(urlParts)-1]
+	workspace := urlParts[len(urlParts)-2]
+
+	return strings.TrimSuffix(repo, ".git"), workspace
+}
+
+func extractRepoAndWorkspaceNameFromSsh(url string) (string, string) {
+	workspaceRepoString := strings.Split(url, ":")[1]
+	workspaceRepoParts := strings.Split(workspaceRepoString, "/")
+
+	workspace := workspaceRepoParts[0]
+	repo := strings.TrimSuffix(workspaceRepoParts[1], ".git")
+
+	return repo, workspace
 }
