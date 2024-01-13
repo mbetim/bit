@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Source struct {
@@ -39,4 +40,23 @@ func GetPullRequestsFromRepo(workspace string, repo string) ([]PullRequest, erro
 	}
 
 	return prs.Values, nil
+}
+
+func GetPullRequestById(workspace string, repo string, prId int) (PullRequest, error) {
+	var pr PullRequest
+
+	resp, err := MakeHttpRequest("GET", BaseURL+"/repositories/"+workspace+"/"+repo+"/pullrequests/"+strconv.Itoa(prId), nil, &pr)
+	if err != nil {
+		return pr, err
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return pr, fmt.Errorf("pull request %d from %v/%v not found", prId, workspace, repo)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return pr, fmt.Errorf("error: status code getting pr is %d", resp.StatusCode)
+	}
+
+	return pr, nil
 }
