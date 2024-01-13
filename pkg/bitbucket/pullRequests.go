@@ -7,6 +7,12 @@ import (
 	"strconv"
 )
 
+type Links struct {
+	Html struct {
+		Href string `json:href`
+	} `json:html`
+}
+
 type Source struct {
 	Branch struct {
 		Name string `json:"name"`
@@ -17,6 +23,7 @@ type PullRequest struct {
 	Title  string `json:"title"`
 	Source Source `json:"source"`
 	Id     int    `json:"id"`
+	Links  Links  `json:"links"`
 }
 
 type PullRequestResponse struct {
