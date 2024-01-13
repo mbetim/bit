@@ -2,11 +2,10 @@ package pr
 
 import (
 	"fmt"
-	"os/exec"
-	"runtime"
 	"strconv"
 
 	"github.com/mbetim/bit/pkg/bitbucket"
+	"github.com/mbetim/bit/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -34,22 +33,8 @@ var prViewCmd = &cobra.Command{
 			return
 		}
 
-		var shellCmd *exec.Cmd
-		url := pr.Links.Html.Href
-
-		switch runtime.GOOS {
-		case "windows":
-			shellCmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
-		case "darwin":
-			shellCmd = exec.Command("open", url)
-		case "linux":
-			shellCmd = exec.Command("xdg-open", url)
-		default:
-			return
-		}
-
 		fmt.Println("Opening " + pr.Links.Html.Href + " in your browser")
-		shellCmd.Start()
+		utils.OpenBrowser(pr.Links.Html.Href)
 	},
 }
 
