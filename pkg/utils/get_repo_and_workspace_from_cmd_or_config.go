@@ -1,4 +1,4 @@
-package pr
+package utils
 
 import (
 	"github.com/mbetim/bit/pkg/bitbucket"
