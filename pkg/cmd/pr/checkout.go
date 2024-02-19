@@ -40,11 +40,7 @@ var prCheckoutCmd = &cobra.Command{
 			"git pull",
 		}
 
-		commandOutput, err := exec.Command("sh", "-c", strings.Join(commands, " && ")).CombinedOutput()
-		if err != nil {
-			fmt.Println(pr, err)
-			return
-		}
+		commandOutput, _ := exec.Command("sh", "-c", strings.Join(commands, " && ")).CombinedOutput()
 
 		fmt.Println(string(commandOutput))
 	},
