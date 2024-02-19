@@ -11,7 +11,7 @@ func GetRepoAndWorkspaceFromCmdOrConfig(cmd *cobra.Command) (string, string) {
 	repo, _ := cmd.Flags().GetString("repo")
 
 	if repo == "" {
-		repo, workspace, _ = bitbucket.GetRepoAndWorkspaceNameFromCurrentDir()
+		repo, workspace, _ = bitbucket.GetRepoAndWorkspaceNameFromCli()
 		return repo, workspace
 	}
 

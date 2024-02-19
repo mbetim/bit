@@ -22,7 +22,7 @@ var prCheckoutCmd = &cobra.Command{
 			return
 		}
 
-		repo, workspace, err := bitbucket.GetRepoAndWorkspaceNameFromCurrentDir()
+		repo, workspace, err := bitbucket.GetRepoAndWorkspaceNameFromCli()
 		if err != nil {
 			fmt.Println(err)
 			return

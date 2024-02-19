@@ -1,13 +1,11 @@
 package bitbucket
 
 import (
-	"bufio"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/mbetim/bit/pkg/config"
@@ -67,39 +65,14 @@ func MakeHttpRequest(method string, url string, body io.Reader, response interfa
 	return resp, nil
 }
 
-func GetRepoAndWorkspaceNameFromCurrentDir() (string, string, error) {
-	file, err := os.Open(".git/config")
+func GetRepoAndWorkspaceNameFromCli() (string, string, error) {
+	commandOutput, err := exec.Command("bash", "-c", "git remote -v | awk '{print $2}'").Output()
 	if err != nil {
 		return "", "", err
 	}
-	defer file.Close()
 
-	var repoName string
-	var workspaceName string
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		if strings.Contains(line, "url =") && strings.Contains(line, "bitbucket.org") {
-			parts := strings.Split(line, "=")
-
-			if len(parts) != 2 {
-				return "", "", fmt.Errorf("unexpected format of .git/config")
-			}
-
-			url := strings.TrimSpace(parts[1])
-			repoName, workspaceName = extractRepoAndWorkspaceNameFromRemote(url)
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return "", "", err
-	}
-
-	if strings.TrimSpace(repoName) == "" {
-		return "", "", fmt.Errorf("repository URL not found")
-	}
+	url := strings.Split(string(commandOutput), "\n")
+	repoName, workspaceName := extractRepoAndWorkspaceNameFromRemote(url[0])
 
 	return repoName, workspaceName, nil
 }
